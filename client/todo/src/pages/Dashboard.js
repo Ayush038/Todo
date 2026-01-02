@@ -107,7 +107,7 @@ const Dashboard = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await api.put("/todos/mark-all-completed");
+      await api.put("api/todos/mark-all-completed");
       setTodos((prev) => prev.map((t) => ({ ...t, isCompleted: true })));
       Swal.fire("Success", "All todos marked as completed.", "success");
     } catch {
