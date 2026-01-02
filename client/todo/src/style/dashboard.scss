@@ -1,0 +1,193 @@
+.dashboard-page {
+  padding: 2rem;
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+
+  &.dark-mode {
+    background: #0f172a;
+    color: white;
+  }
+
+  &.light-mode {
+    background: #f5f5f5;
+    color: #111;
+  }
+
+  button,
+  select,
+  input {
+    color: inherit;
+    border: 1px solid currentColor;
+    background: transparent;
+    transition: all 0.25s ease;
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 0 10px currentColor;
+      transform: translateY(-1px);
+    }
+  }
+
+  input,
+  select {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 8px currentColor;
+    }
+  }
+  select option {
+    background-color: #0f172a;
+    color: white;
+  }
+
+  &.light-mode select option {
+    background-color: #ffffff;
+    color: #111;
+  }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  .dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 2rem;
+
+    .dashboard-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      span {
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+    }
+
+    h2 {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3.5rem;
+      font-family: "Ubuntu", sans-serif;
+    }
+
+    .dashboard-right {
+      display: flex;
+      gap: 0.5rem;
+
+      button {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .dashboard-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+
+    input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    select {
+      min-width: 140px;
+    }
+
+    button {
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+
+  .todo-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .todo-card {
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-family: "Ubuntu", sans-serif;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    background: rgba(255, 255, 255, 0.9);
+
+    .dark-mode & {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .todo-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .todo-desc {
+    margin: 0.5rem 0;
+    opacity: 0.9;
+  }
+
+  .todo-status {
+    font-size: 0.9rem;
+  }
+
+  .todo-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+
+    button {
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+
+    button {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .add-todo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+
+    button {
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  }
+}
