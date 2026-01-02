@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://todo-server-ecdf.onrender.com"
+  baseURL: "https://this-should-404.com"
 });
 
 api.interceptors.request.use(config => {
