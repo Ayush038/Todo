@@ -17,7 +17,7 @@ const AddTodo = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/todos", { title, description });
+      await api.post("/api/todos", { title, description });
       Swal.fire("Success", "Todo added successfully!", "success");
       navigate("/dashboard");
     } catch (err) {

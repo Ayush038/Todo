@@ -20,7 +20,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/auth/signup", { name, email, password, role });
+      await api.post("/api/auth/signup", { name, email, password, role });
       await Swal.fire("Success", "Signup successful! Please login.", "success");
       navigate("/");
     } catch (err) {

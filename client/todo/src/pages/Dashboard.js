@@ -27,7 +27,7 @@ const Dashboard = () => {
 
   const fetchTodos = async () => {
     try {
-      const res = await api.get("/todos");
+      const res = await api.get("/api/todos");
       setTodos(res.data);
     } catch {
       Swal.fire("Error", "Failed to fetch todos", "error");
@@ -75,7 +75,7 @@ const Dashboard = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await api.delete(`/todos/${id}`);
+      await api.delete(`/api/todos/${id}`);
       setTodos((prev) => prev.filter((t) => t._id !== id));
       Swal.fire("Deleted!", "Todo has been deleted.", "success");
     } catch (err) {

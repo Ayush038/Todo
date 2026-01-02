@@ -17,7 +17,7 @@ const EditTodo = () => {
 
     const fetchTodo = async () => {
       try {
-        const res = await api.get("/todos");
+        const res = await api.get("/api/todos");
         const todo = res.data.find((t) => t._id === id);
         if (!todo) {
           Swal.fire("Error", "Todo not found", "error");
@@ -38,7 +38,7 @@ const EditTodo = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/todos/${id}`, { title, description, isCompleted });
+      await api.put(`/api/todos/${id}`, { title, description, isCompleted });
       Swal.fire("Success", "Todo updated successfully!", "success");
       navigate("/dashboard");
     } catch (err) {
