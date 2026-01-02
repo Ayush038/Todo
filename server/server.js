@@ -1,18 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const authRoutes = require("./routes/auth");
-const todoRoutes = require("./routes/todos");
 const cors = require("cors");
 require("dotenv").config();
 
-app.use(
-  cors({
-    origin: "https://todo-clients.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors({
+  origin: "https://todo-clients.vercel.app",
+}));
+
 app.use(express.json());
 
 mongoose
@@ -23,11 +18,12 @@ mongoose
     process.exit(1);
 });
 
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/todos", require("./routes/todos"));
+
 app.get("/", (req, res) => {
   res.send("API running");
 });
-app.use("/api/auth", authRoutes);
-app.use("/api/todos", todoRoutes);
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
