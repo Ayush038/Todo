@@ -24,6 +24,7 @@ app.use("/api/todos", require("./routes/todos"));
 app.get("/", (req, res) => {
   res.send("API running");
 });
+app.get("/ping", (req, res) => res.json({ status: "alive" }));
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
