@@ -20,6 +20,8 @@ mongoose
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/todos", require("./routes/todos"));
+app.use("/api/users", require("./routes/users"));
+app.use("/api/activity-logs",require("./routes/activityLogs"));
 
 app.get("/", (req, res) => {
   res.send("API running");

@@ -1,0 +1,63 @@
+.task-search {
+  margin: 16px 0;
+}
+
+.task-search__input {
+  width: 100%;
+  padding: 10px 14px;
+
+  font-size: 14px;
+  border-radius: 6px;
+
+  background: var(--bg-surface);
+  color: var(--text-primary);
+
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* Filters row */
+.task-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin: 12px 0 24px;
+}
+
+.task-filters__left {
+  display: flex;
+  gap: 12px;
+}
+
+/* Selects */
+.task-filters select {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* Mark all button */
+.task-filters__mark-all {
+  padding: 8px 14px;
+  font-size: 13px;
+
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: transparent;
+
+  color: var(--text-secondary);
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition: background-color 0.15s ease;
+}
+
+.task-filters__mark-all:hover {
+  background: var(--bg-hover);
+}

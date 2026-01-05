@@ -1,0 +1,43 @@
+/* =========================
+   LIGHT MODE (DEFAULT)
+   ========================= */
+:root {
+  /* Background layers */
+  --bg-base: linear-gradient(
+    180deg,
+    #f8fafc 0%,
+    #eef2f7 100%
+  );
+
+  --bg-surface: #ffffff;
+  --bg-elevated: #f9fafb;
+  --bg-hover: #eef2f7;
+
+  /* Text colors */
+  --text-primary: #0f172a;   /* headings */
+  --text-secondary: #475569; /* body text */
+  --text-muted: #64748b;     /* meta, timestamps */
+}
+
+
+/* =========================
+   DARK MODE
+   ========================= */
+[data-theme="dark"] {
+  /* Background layers */
+  --bg-base: linear-gradient(
+    180deg,
+    #020617 0%,
+    #020617 30%,
+    #020617 100%
+  );
+
+  --bg-surface: #0b1220;
+  --bg-elevated: #111c33;
+  --bg-hover: #1a2a4a;
+
+  /* Text colors */
+  --text-primary: #e5e7eb;
+  --text-secondary: #cbd5f5;
+  --text-muted: #94a3b8;
+}

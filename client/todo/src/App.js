@@ -1,39 +1,104 @@
-import { Routes, Route, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { useEffect, useCallback } from "react";
+import { useAuth } from "./context/AuthContext";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import AddTodo from "./pages/AddTodo";
-import EditTodo from "./pages/EditTodo";
-import { AnimatePresence } from "framer-motion";
 
-import { setTheme, getTheme } from "./utils/themes";
+/* ---------- Route Guards ---------- */
 
-function App() {
-  const locate = useLocation();
-  const [theme, setThemeState] = useState(getTheme());
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
+};
+
+/* ---------- Routes + Theme Brain ---------- */
+
+const AppRoutes = () => {
+  const { isAuthenticated, login, signup } = useAuth();
+  const navigate = useNavigate();
+
+  /* 🔥 THEME INITIALIZATION */
   useEffect(() => {
-    setTheme(theme);
-  }, [theme]);
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    setThemeState(newTheme);
-  };
+  /* 🔥 THEME TOGGLE (global, reusable) */
+  const toggleTheme = useCallback(() => {
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") || "light";
+
+    const nextTheme = currentTheme === "dark" ? "light" : "dark";
+
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("theme", nextTheme);
+  }, []);
 
   return (
-    <AnimatePresence>
-      <Routes location={locate} key={locate.pathname}>
-        <Route path="/" element={<Login theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/signup" element={<Signup theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/dashboard" element={<Dashboard theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/add" element={<AddTodo theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/edit/:id" element={<EditTodo theme={theme} toggleTheme={toggleTheme} />} />
+    <>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            isAuthenticated
+              ? <Navigate to="/dashboard" replace />
+              : <Navigate to="/login" replace />
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login onSubmit={login} />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup
+                onSubmit={async (data) => {
+                  await signup(data);
+                  navigate("/login");
+                }}
+              />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </AnimatePresence>
+    </>
   );
-}
+};
+
+/* ---------- App Root ---------- */
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+};
 
 export default App;

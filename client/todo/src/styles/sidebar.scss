@@ -1,0 +1,70 @@
+.dashboard__sidebar {
+  height: 93vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+
+  background: var(--bg-surface);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Add task button */
+.sidebar__add-task-btn {
+  padding: 10px 12px;
+  margin-bottom: 16px;
+
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: transparent;
+  border-radius: 4px;
+  flex-shrink: 0;
+
+  color: var(--text-secondary);
+}
+
+/* Title */
+.sidebar__title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 8px 0 12px;
+  flex-shrink: 0;
+
+  color: var(--text-primary);
+}
+
+/* Activity list */
+.sidebar__activity-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Scrollbar */
+.sidebar__activity-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar__activity-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+}
+
+/* Empty state */
+.sidebar__empty {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Activity item */
+.sidebar__activity-item {
+  padding: 8px 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+
+  color: var(--text-secondary);
+  transition: background-color 0.15s ease;
+}
+
+.sidebar__activity-item:hover {
+  background: var(--bg-hover);
+}

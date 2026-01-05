@@ -1,203 +1,271 @@
-import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
-import { setTheme as persistTheme, getTheme } from "../utils/themes";
-import Swal from "sweetalert2";
+import { useEffect, useState } from "react";
+import api from "../api/axios";
+import TaskModal from "../components/TaskModal/TaskModal";
+import { useAuth } from "../context/AuthContext";
+import Sidebar from "../components/Sidebar";
+import TaskItem from "../components/TaskItem";
+import Header from "../components/Header";
+import TaskSearch from "../components/TaskSearch";
+import TaskFilters from "../components/TaskFilter";
 
-const TODOS_PER_PAGE = 5;
+const PRIORITY_ORDER = {
+  Urgent: 4,
+  High: 3,
+  Medium: 2,
+  Low: 1
+};
+
+const STATUS_ORDER = {
+  "Not Started": 1,
+  "In Progress": 2,
+  Done: 3
+};
+
+const TASKS_PER_PAGE = 5;
 
 const Dashboard = () => {
+  const { user } = useAuth();
+
   const [todos, setTodos] = useState([]);
-  const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState(getTheme());
-  const [currentPage, setCurrentPage] = useState(1);
+  const [activityLogs, setActivityLogs] = useState([]);
+
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filters, setFilters] = useState({
+    status: "",
+    priority: "",
+    category: ""
+  });
 
-  const navigate = useNavigate();
+  // 🔹 ADMIN FILTER
+  const [users, setUsers] = useState([]);
+  const [assignedUser, setAssignedUser] = useState("");
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    setUser(storedUser);
-  }, []);
+  const [sortBy, setSortBy] = useState("dueDate");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    persistTheme(theme);
-  }, [theme]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("view");
+  const [modalSource, setModalSource] = useState("task_list");
+  const [selectedTodoId, setSelectedTodoId] = useState(null);
+  const [activityContext, setActivityContext] = useState(null);
 
-  const fetchTodos = async () => {
-    try {
-      const res = await api.get("/api/todos");
-      setTodos(res.data);
-    } catch {
-      Swal.fire("Error", "Failed to fetch todos", "error");
-    }
-  };
+  const [markAllLoading, setMarkAllLoading] = useState(false);
 
   useEffect(() => {
     fetchTodos();
-  }, []);
+    fetchActivityLogs();
 
-  const filteredTodos = useMemo(() => {
-    return todos
-      .filter((t) => {
-        if (filter === "completed") return t.isCompleted;
-        if (filter === "pending") return !t.isCompleted;
-        return true;
-      })
-      .filter((t) =>
-        `${t.title} ${t.description || ""}`
-          .toLowerCase()
-          .includes(search.toLowerCase())
-      );
-  }, [todos, search, filter]);
+    // 🔹 ADMIN FILTER: fetch users
+    if (user?.role === "admin") {
+      api.get("/users").then(res => setUsers(res.data));
+    }
+  }, [user]);
 
+  // reset pagination when view changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, filter]);
+  }, [search, filters, sortBy, assignedUser]);
 
-  const totalPages = Math.ceil(filteredTodos.length / TODOS_PER_PAGE);
+  const fetchTodos = async () => {
+    const res = await api.get("/todos");
+    setTodos(res.data);
+  };
 
-  const paginatedTodos = filteredTodos.slice(
-    (currentPage - 1) * TODOS_PER_PAGE,
-    currentPage * TODOS_PER_PAGE
+  const fetchActivityLogs = async () => {
+    const res = await api.get("/activity-logs");
+    setActivityLogs(res.data);
+  };
+
+  const refreshDashboard = async () => {
+    await fetchTodos();
+    await fetchActivityLogs();
+  };
+
+  const handleMarkAllDone = async () => {
+    if (markAllLoading) return;
+    try {
+      setMarkAllLoading(true);
+      await api.put("/todos/mark-all-completed");
+      await refreshDashboard();
+    } finally {
+      setMarkAllLoading(false);
+    }
+  };
+
+  // FILTER
+  const filteredTodos = todos
+    .filter(todo =>
+      todo.title.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter(todo =>
+      !filters.status || todo.status === filters.status
+    )
+    .filter(todo =>
+      !filters.priority || todo.priority === filters.priority
+    )
+    .filter(todo =>
+      !filters.category || todo.category === filters.category
+    )
+    // 🔹 ADMIN FILTER
+    .filter(todo =>
+      user?.role !== "admin" ||
+      !assignedUser ||
+      todo.assignedTo?._id === assignedUser
+    );
+
+  // SORT
+  const sortedTodos = [...filteredTodos].sort((a, b) => {
+    if (sortBy === "dueDate") {
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      return new Date(a.dueDate) - new Date(b.dueDate);
+    }
+
+    if (sortBy === "priority") {
+      return (PRIORITY_ORDER[b.priority] || 0) -
+             (PRIORITY_ORDER[a.priority] || 0);
+    }
+
+    if (sortBy === "status") {
+      return (STATUS_ORDER[a.status] || 0) -
+             (STATUS_ORDER[b.status] || 0);
+    }
+
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedTodos.length / TASKS_PER_PAGE);
+
+  const paginatedTodos = sortedTodos.slice(
+    (currentPage - 1) * TASKS_PER_PAGE,
+    currentPage * TASKS_PER_PAGE
   );
 
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "This will delete the todo permanently!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      await api.delete(`/api/todos/${id}`);
-      setTodos((prev) => prev.filter((t) => t._id !== id));
-      Swal.fire("Deleted!", "Todo has been deleted.", "success");
-    } catch (err) {
-      Swal.fire(
-        "Error",
-        err.response?.data?.message || "Failed to delete todo",
-        "error"
-      );
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
-  const markAllCompleted = async () => {
-    const result = await Swal.fire({
-      title: "Mark all todos completed?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, mark all",
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      await api.put("/api/todos/mark-all-completed");
-      setTodos((prev) => prev.map((t) => ({ ...t, isCompleted: true })));
-      Swal.fire("Success", "All todos marked as completed.", "success");
-    } catch {
-      Swal.fire("Error", "Failed to mark todos", "error");
-    }
-  };
+  const hasIncompleteTasks = todos.some(todo => todo.status !== "Done");
 
   return (
-    <div className={`dashboard-page ${theme}-mode`}>
-      <header className="dashboard-header">
-        {user && (
-          <div className="dashboard-left">
-            <span>Name: {user.name}</span>
-            <span>Role: {user.role}</span>
-          </div>
-        )}
+    <div className="dashboard">
+      <Header />
 
-        <h2>📊 Dashboard 📈</h2>
-
-        <div className="dashboard-right">
-          <button onClick={toggleTheme}>
-            {theme === "dark" ? "🌞 Light" : "🌙 Dark"}
-          </button>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </header>
-
-      <div className="dashboard-actions">
-        <input
-          type="text"
-          placeholder="Search todos..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      <div className="dashboard__content">
+        <Sidebar
+          activityLogs={activityLogs}
+          onAddTask={() => {
+            setSelectedTodoId(null);
+            setModalMode("create");
+            setModalSource("task_list");
+            setModalOpen(true);
+          }}
+          onOpenActivity={(log) => {
+            setSelectedTodoId(log.todo);
+            setActivityContext(log);
+            setModalMode("view");
+            setModalSource("activity_log");
+            setModalOpen(true);
+          }}
         />
 
-        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="all">All</option>
-          <option value="completed">Completed</option>
-          <option value="pending">Pending</option>
-        </select>
+        <main className="dashboard__main">
+          <h2>Tasks</h2>
 
-        <button onClick={markAllCompleted}>Mark All Completed</button>
-      </div>
+          <TaskSearch value={search} onChange={setSearch} />
 
-      <div className="todo-container">
-        {paginatedTodos.map((todo) => (
-          <div className="todo-card" key={todo._id}>
-            <p>Title: {todo.title}</p>
-            <p>Description: {todo.description || "—"}</p>
-            <p>
-              Status: <strong>{todo.isCompleted ? "Done" : "Pending"}</strong>
-            </p>
+          <TaskFilters
+            filters={filters}
+            onChange={setFilters}
+            onMarkAllDone={handleMarkAllDone}
+            disableMarkAllDone={!hasIncompleteTasks || markAllLoading}
+          />
 
-            <div className="todo-actions">
-              <button onClick={() => navigate(`/edit/${todo._id}`)}>
-                Edit
+          {/* 🔹 ADMIN FILTER UI */}
+          {user?.role === "admin" && (
+            <select
+              className="assigned-user-select"
+              value={assignedUser}
+              onChange={e => setAssignedUser(e.target.value)}
+            >
+              <option value="">All Users</option>
+              {users.map(u => (
+                <option key={u._id} value={u._id}>
+                  {u.name}
+                </option>
+              ))}
+            </select>
+          )}
+
+          <select
+            className="sort-select"
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value)}
+          >
+            <option value="dueDate">Due date</option>
+            <option value="priority">Priority</option>
+            <option value="status">Status</option>
+          </select>
+
+          <ul>
+            {paginatedTodos.length === 0 ? (
+              <li className="empty-state">
+                <p className="empty-state__title">
+                  {todos.length === 0
+                    ? "No tasks yet"
+                    : "No tasks match your filters"}
+                </p>
+                <p className="empty-state__subtitle">
+                  {todos.length === 0
+                    ? "Create one to get started."
+                    : "Try adjusting filters."}
+                </p>
+              </li>
+            ) : (
+              paginatedTodos.map(todo => (
+                <TaskItem
+                  key={todo._id}
+                  todo={todo}
+                  onClick={() => {
+                    setSelectedTodoId(todo._id);
+                    setModalMode("view");
+                    setModalSource("task_list");
+                    setModalOpen(true);
+                  }}
+                />
+              ))
+            )}
+          </ul>
+
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                onClick={() => setCurrentPage(p => p - 1)}
+                disabled={currentPage === 1}
+              >
+                Prev
               </button>
-              <button onClick={() => handleDelete(todo._id)}>
-                Delete
+
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                onClick={() => setCurrentPage(p => p + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
               </button>
             </div>
-          </div>
-        ))}
+          )}
+        </main>
       </div>
 
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-          >
-            Prev
-          </button>
-
-          <span>
-            Page {currentPage} / {totalPages}
-          </span>
-
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
-          >
-            Next
-          </button>
-        </div>
-      )}
-
-      <div className="add-todo-wrapper">
-        <button onClick={() => navigate("/add")}>Add Todo</button>
-      </div>
+      <TaskModal
+        isOpen={modalOpen}
+        mode={modalMode}
+        source={modalSource}
+        todoId={selectedTodoId}
+        activityContext={activityContext}
+        onClose={() => setModalOpen(false)}
+        onSuccess={refreshDashboard}
+      />
     </div>
   );
 };

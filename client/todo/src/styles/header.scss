@@ -1,0 +1,167 @@
+.app-header {
+  height: 64px;
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: var(--bg-surface);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+  transition: background-color 0.25s ease;
+}
+
+.app-header__left {
+  display: flex;
+  align-items: center;
+}
+
+.app-header__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+/* =========================
+   THEME TOGGLE
+   ========================= */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: var(--bg-elevated);
+
+  cursor: pointer;
+  color: var(--text-secondary);
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-hover);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* =========================
+   USER DROPDOWN TRIGGER
+   ========================= */
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  background: var(--bg-elevated);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-secondary);
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.header-user:hover {
+  background: var(--bg-hover);
+}
+
+/* caret */
+.header-user::after {
+  content: "▾";
+  font-size: 10px;
+  margin-left: 4px;
+  opacity: 0.6;
+}
+
+.header-role {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* =========================
+   DROPDOWN PANEL
+   ========================= */
+.header-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+
+  width: 220px;
+
+  background: var(--bg-elevated);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+  overflow: hidden;
+  z-index: 2000;
+}
+
+.header-dropdown__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 12px;
+  font-size: 13px;
+
+  color: var(--text-secondary);
+}
+
+.header-dropdown__row:hover {
+  background: var(--bg-hover);
+}
+
+.header-dropdown__row .label {
+  color: var(--text-muted);
+}
+
+/* divider */
+.header-dropdown__divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 4px 0;
+}
+
+/* logout button */
+.header-dropdown__logout {
+  width: 100%;
+  padding: 10px 12px;
+
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+
+  color: var(--text-secondary);
+}
+
+.header-dropdown__logout:hover {
+  background: var(--bg-hover);
+}
