@@ -5,7 +5,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 app.use(cors({
-  origin: "https://todoproject-pink.vercel.app",
+  origin: "https://task-mgmt-pearl.vercel.app",
 }));
 
 app.use(express.json());
