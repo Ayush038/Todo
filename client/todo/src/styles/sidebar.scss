@@ -1,14 +1,22 @@
-.dashboard__sidebar {
-  height: 93vh;
+/* =========================
+   SIDEBAR CONTENT ROOT
+   (layout is handled by dashboard.css)
+========================= */
+
+.sidebar {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  gap: 0;
 
-  background: var(--bg-surface);
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  /* 🔑 REQUIRED FOR SCROLL TO WORK */
+  height: 100%;
+  min-height: 0;
 }
 
-/* Add task button */
+/* =========================
+   ADD TASK BUTTON
+========================= */
+
 .sidebar__add-task-btn {
   padding: 10px 12px;
   margin-bottom: 16px;
@@ -16,29 +24,46 @@
   border: 1px solid rgba(0, 0, 0, 0.25);
   background: transparent;
   border-radius: 4px;
-  flex-shrink: 0;
 
   color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+
+  flex-shrink: 0;
 }
 
-/* Title */
+.sidebar__add-task-btn:hover {
+  background: var(--bg-hover);
+}
+
+/* =========================
+   TITLE
+========================= */
+
 .sidebar__title {
   font-size: 14px;
   font-weight: 600;
   margin: 8px 0 12px;
-  flex-shrink: 0;
 
   color: var(--text-primary);
+  flex-shrink: 0;
 }
 
-/* Activity list */
+/* =========================
+   ACTIVITY LIST
+   (THIS is the scrollable element)
+========================= */
+
 .sidebar__activity-list {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
   padding-right: 6px;
+  list-style: none;
+  margin: 0;
 }
 
-/* Scrollbar */
+/* Scrollbar styling */
 .sidebar__activity-list::-webkit-scrollbar {
   width: 6px;
 }
@@ -48,23 +73,65 @@
   border-radius: 3px;
 }
 
-/* Empty state */
+/* =========================
+   EMPTY STATE
+========================= */
+
 .sidebar__empty {
   font-size: 13px;
   color: var(--text-muted);
+  padding: 8px 4px;
 }
 
-/* Activity item */
+/* =========================
+   ACTIVITY ITEM
+========================= */
+
 .sidebar__activity-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
   padding: 8px 6px;
-  font-size: 13px;
-  cursor: pointer;
   border-radius: 4px;
 
+  font-size: 13px;
   color: var(--text-secondary);
+  cursor: pointer;
+
   transition: background-color 0.15s ease;
 }
 
 .sidebar__activity-item:hover {
   background: var(--bg-hover);
+}
+
+/* =========================
+   ACTIVITY META
+========================= */
+
+.activity-action {
+  font-size: 13px;
+}
+
+.activity-timestamp {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* =========================
+   MOBILE REFINEMENTS
+========================= */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar__add-task-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
 }

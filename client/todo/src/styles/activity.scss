@@ -8,17 +8,50 @@
   cursor: pointer;
 
   transition: background-color 0.15s ease;
+
+  min-width: 0; /* flex sanity */
 }
 
 .sidebar__activity-item:hover {
   background: var(--bg-hover);
 }
 
+/* =========================
+   ACTIVITY TEXT
+========================= */
+
 .activity-action {
   font-size: 13px;
+  color: var(--text-secondary);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .activity-timestamp {
   font-size: 11px;
   opacity: 0.6;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* =========================
+   MOBILE (≤ 480px)
+========================= */
+
+@media (max-width: 480px) {
+  .sidebar__activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .activity-action {
+    white-space: normal;
+  }
+
+  .activity-timestamp {
+    font-size: 10px;
+  }
 }

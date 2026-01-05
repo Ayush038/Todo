@@ -12,9 +12,15 @@
   transition: background-color 0.25s ease;
 }
 
+/* =========================
+   LEFT SECTION
+========================= */
+
 .app-header__left {
   display: flex;
   align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .app-header__title {
@@ -22,18 +28,49 @@
   font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+/* =========================
+   RIGHT SECTION
+========================= */
 
 .app-header__right {
   display: flex;
   align-items: center;
   gap: 10px;
   position: relative;
+  flex-shrink: 0;
+}
+
+/* =========================
+   SIDEBAR TOGGLE (MOBILE)
+========================= */
+
+.header-menu-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: var(--bg-elevated);
+
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-secondary);
 }
 
 /* =========================
    THEME TOGGLE
-   ========================= */
+========================= */
+
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -64,7 +101,8 @@
 
 /* =========================
    USER DROPDOWN TRIGGER
-   ========================= */
+========================= */
+
 .header-user {
   display: flex;
   align-items: center;
@@ -79,6 +117,8 @@
   font-size: 14px;
   cursor: pointer;
   color: var(--text-secondary);
+
+  white-space: nowrap;
 
   transition:
     background-color 0.15s ease,
@@ -104,7 +144,8 @@
 
 /* =========================
    DROPDOWN PANEL
-   ========================= */
+========================= */
+
 .header-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -141,14 +182,12 @@
   color: var(--text-muted);
 }
 
-/* divider */
 .header-dropdown__divider {
   height: 1px;
   background: rgba(0, 0, 0, 0.1);
   margin: 4px 0;
 }
 
-/* logout button */
 .header-dropdown__logout {
   width: 100%;
   padding: 10px 12px;
@@ -164,4 +203,40 @@
 
 .header-dropdown__logout:hover {
   background: var(--bg-hover);
+}
+
+/* =========================
+   TABLET (≤ 1024px)
+========================= */
+
+@media (max-width: 1024px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .app-header__title {
+    font-size: 18px;
+  }
+}
+
+/* =========================
+   MOBILE (≤ 768px)
+========================= */
+
+@media (max-width: 768px) {
+  .header-menu-btn {
+    display: inline-flex;
+  }
+
+  .app-header__title {
+    font-size: 16px;
+  }
+
+  .header-role {
+    display: none;
+  }
+
+  .header-user {
+    padding: 6px 8px;
+  }
 }

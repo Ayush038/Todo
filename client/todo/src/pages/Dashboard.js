@@ -36,7 +36,7 @@ const Dashboard = () => {
     category: ""
   });
 
-  // 🔹 ADMIN FILTER
+  // ADMIN FILTER
   const [users, setUsers] = useState([]);
   const [assignedUser, setAssignedUser] = useState("");
 
@@ -51,17 +51,18 @@ const Dashboard = () => {
 
   const [markAllLoading, setMarkAllLoading] = useState(false);
 
+  // 🔹 RESPONSIVE SIDEBAR STATE
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   useEffect(() => {
     fetchTodos();
     fetchActivityLogs();
 
-    // 🔹 ADMIN FILTER: fetch users
     if (user?.role === "admin") {
       api.get("/users").then(res => setUsers(res.data));
     }
   }, [user]);
 
-  // reset pagination when view changes
   useEffect(() => {
     setCurrentPage(1);
   }, [search, filters, sortBy, assignedUser]);
@@ -81,8 +82,16 @@ const Dashboard = () => {
     await fetchActivityLogs();
   };
 
+  const openCreateTaskModal = () => {
+    setSelectedTodoId(null);
+    setModalMode("create");
+    setModalSource("task_list");
+    setModalOpen(true);
+  };
+
   const handleMarkAllDone = async () => {
     if (markAllLoading) return;
+
     try {
       setMarkAllLoading(true);
       await api.put("/todos/mark-all-completed");
@@ -106,7 +115,6 @@ const Dashboard = () => {
     .filter(todo =>
       !filters.category || todo.category === filters.category
     )
-    // 🔹 ADMIN FILTER
     .filter(todo =>
       user?.role !== "admin" ||
       !assignedUser ||
@@ -145,25 +153,26 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <Header />
+      <Header
+        onToggleSidebar={() => setSidebarOpen(prev => !prev)}
+        onAddTask={openCreateTaskModal}
+      />
 
       <div className="dashboard__content">
-        <Sidebar
-          activityLogs={activityLogs}
-          onAddTask={() => {
-            setSelectedTodoId(null);
-            setModalMode("create");
-            setModalSource("task_list");
-            setModalOpen(true);
-          }}
-          onOpenActivity={(log) => {
-            setSelectedTodoId(log.todo);
-            setActivityContext(log);
-            setModalMode("view");
-            setModalSource("activity_log");
-            setModalOpen(true);
-          }}
-        />
+        <aside className={`dashboard__sidebar ${sidebarOpen ? "is-open" : ""}`}>
+          <Sidebar
+            activityLogs={activityLogs}
+            onAddTask={openCreateTaskModal}
+            onOpenActivity={(log) => {
+              setSelectedTodoId(log.todo);
+              setActivityContext(log);
+              setModalMode("view");
+              setModalSource("activity_log");
+              setModalOpen(true);
+              setSidebarOpen(false);
+            }}
+          />
+        </aside>
 
         <main className="dashboard__main">
           <h2>Tasks</h2>
@@ -177,7 +186,6 @@ const Dashboard = () => {
             disableMarkAllDone={!hasIncompleteTasks || markAllLoading}
           />
 
-          {/* 🔹 ADMIN FILTER UI */}
           {user?.role === "admin" && (
             <select
               className="assigned-user-select"

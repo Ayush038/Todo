@@ -15,11 +15,15 @@
   border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-/* Filters row */
+/* =========================
+   FILTERS ROW
+========================= */
+
 .task-filters {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 
   margin: 12px 0 24px;
 }
@@ -27,9 +31,14 @@
 .task-filters__left {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
-/* Selects */
+/* =========================
+   SELECTS
+========================= */
+
 .task-filters select {
   padding: 6px 10px;
   font-size: 13px;
@@ -41,7 +50,10 @@
   border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-/* Mark all button */
+/* =========================
+   MARK ALL BUTTON
+========================= */
+
 .task-filters__mark-all {
   padding: 8px 14px;
   font-size: 13px;
@@ -51,8 +63,8 @@
   background: transparent;
 
   color: var(--text-secondary);
-
   cursor: pointer;
+
   white-space: nowrap;
 
   transition: background-color 0.15s ease;
@@ -60,4 +72,40 @@
 
 .task-filters__mark-all:hover {
   background: var(--bg-hover);
+}
+
+/* =========================
+   TABLET (≤ 768px)
+========================= */
+
+@media (max-width: 768px) {
+  .task-filters {
+    align-items: flex-start;
+  }
+}
+
+/* =========================
+   MOBILE (≤ 480px)
+========================= */
+
+@media (max-width: 480px) {
+  .task-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .task-filters__left {
+    width: 100%;
+  }
+
+  .task-filters select {
+    width: 100%;
+  }
+
+  .task-filters__mark-all {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
 }

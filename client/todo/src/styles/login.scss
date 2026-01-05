@@ -9,6 +9,10 @@
   animation: fadeIn 0.35s ease forwards;
 }
 
+/* =========================
+   LEFT / RIGHT PANELS
+========================= */
+
 .auth-left,
 .auth-right {
   width: 50%;
@@ -18,7 +22,10 @@
   padding: 3rem;
 }
 
-/* Info panel */
+/* =========================
+   INFO PANEL
+========================= */
+
 .auth-info {
   text-align: center;
   background: var(--bg-surface);
@@ -35,7 +42,10 @@
   color: var(--text-secondary);
 }
 
-/* Card */
+/* =========================
+   AUTH CARD
+========================= */
+
 .auth-card {
   width: 100%;
   max-width: 420px;
@@ -66,7 +76,10 @@
   color: var(--text-secondary);
 }
 
-/* Inputs */
+/* =========================
+   INPUTS
+========================= */
+
 .auth-card input,
 .auth-card select {
   padding: 0.8rem 1rem;
@@ -88,7 +101,10 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
-/* Button */
+/* =========================
+   BUTTON
+========================= */
+
 .auth-card button {
   margin-top: 1rem;
   padding: 0.8rem;
@@ -111,7 +127,10 @@
   box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
 }
 
-/* Footer */
+/* =========================
+   FOOTER
+========================= */
+
 .auth-footer {
   margin-top: 1.5rem;
   text-align: center;
@@ -129,7 +148,10 @@
   text-decoration: underline;
 }
 
-/* Responsive */
+/* =========================
+   TABLET (≤ 900px)
+========================= */
+
 @media (max-width: 900px) {
   .auth-page {
     flex-direction: column;
@@ -138,12 +160,54 @@
   .auth-left,
   .auth-right {
     width: 100%;
+    padding: 2.5rem 2rem;
   }
 
   .auth-info {
     padding: 2rem 1.5rem;
   }
+
+  .auth-info h1 {
+    font-size: 2.2rem;
+  }
 }
+
+/* =========================
+   MOBILE (≤ 600px)
+========================= */
+
+@media (max-width: 600px) {
+  .auth-left {
+    display: none; /* info panel goes away */
+  }
+
+  .auth-right {
+    padding: 1.5rem;
+  }
+
+  .auth-card {
+    padding: 1.75rem;
+    border-radius: 14px;
+  }
+
+  .auth-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .auth-card input,
+  .auth-card select {
+    font-size: 0.95rem;
+  }
+
+  .auth-card button {
+    font-size: 0.95rem;
+  }
+}
+
+/* =========================
+   ANIMATION
+========================= */
 
 @keyframes fadeIn {
   from {

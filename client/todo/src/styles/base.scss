@@ -1,12 +1,31 @@
-* {
+/* =========================
+   BOX MODEL
+========================= */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
-* {
+
+/* =========================
+   GLOBAL TRANSITIONS (SCOPED)
+========================= */
+
+body,
+button,
+input,
+select,
+textarea {
   transition:
     background-color 0.25s ease,
     color 0.25s ease,
     border-color 0.25s ease;
 }
+
+/* =========================
+   ROOT & BODY
+========================= */
 
 html,
 body {
@@ -20,24 +39,35 @@ body {
   background: var(--bg-base);
   color: var(--text-secondary);
 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   transition:
-    background 0.3s ease,
+    background-color 0.3s ease,
     color 0.25s ease;
 }
 
-h1, h2, h3, h4, h5, h6 {
+/* =========================
+   HEADINGS
+========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--text-primary);
+  margin: 0;
 }
+
+/* =========================
+   INTERACTIVE ELEMENTS
+========================= */
 
 button {
   cursor: pointer;
   font-family: inherit;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
 }
 
 input,
@@ -48,4 +78,36 @@ button {
   background: transparent;
 }
 
+/* Prevent iOS zoom on focus */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
 
+/* =========================
+   LIST RESET
+========================= */
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* =========================
+   ACCESSIBILITY & UX
+========================= */
+
+:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.6);
+  outline-offset: 2px;
+}
+
+/* Disable transitions for users who hate motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
