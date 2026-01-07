@@ -5,7 +5,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 app.use(cors({
-  origin: "https://todomgmt.vercel.app",
+  origin: "https://taskmgmt-six.vercel.app",
 }));
 
 app.use(express.json());
