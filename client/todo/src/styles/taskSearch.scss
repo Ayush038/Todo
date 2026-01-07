@@ -1,23 +1,32 @@
+
+:root {
+  --control-height: 40px;
+  --control-radius: 8px;
+}
+
+
 .task-search {
   margin: 16px 0;
+  display: flex;
 }
 
 .task-search__input {
   width: 100%;
-  padding: 10px 14px;
+  height: var(--control-height);
 
+  padding: 0 14px;
   font-size: 14px;
-  border-radius: 6px;
+  line-height: var(--control-height);
+
+  border-radius: var(--control-radius);
 
   background: var(--bg-surface);
   color: var(--text-primary);
 
   border: 1px solid rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
 }
 
-/* =========================
-   FILTERS ROW
-========================= */
 
 .task-filters {
   display: flex;
@@ -30,35 +39,42 @@
 
 .task-filters__left {
   display: flex;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
   min-width: 0;
 }
 
-/* =========================
-   SELECTS
-========================= */
 
 .task-filters select {
-  padding: 6px 10px;
-  font-size: 13px;
-  border-radius: 6px;
+  height: var(--control-height);
+  line-height: var(--control-height);
+  margin-top: 10px;
+
+  padding: 0 12px;
+  font-size: 14px;
+
+  border-radius: var(--control-radius);
 
   background: var(--bg-surface);
   color: var(--text-secondary);
 
   border: 1px solid rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
 }
 
-/* =========================
-   MARK ALL BUTTON
-========================= */
 
 .task-filters__mark-all {
-  padding: 8px 14px;
-  font-size: 13px;
+  height: var(--control-height);
+  padding: 0 14px;
 
-  border-radius: 6px;
+  font-size: 13px;
+  line-height: var(--control-height);
+
+  border-radius: var(--control-radius);
   border: 1px solid rgba(0, 0, 0, 0.35);
   background: transparent;
 
@@ -74,19 +90,13 @@
   background: var(--bg-hover);
 }
 
-/* =========================
-   TABLET (≤ 768px)
-========================= */
 
 @media (max-width: 768px) {
   .task-filters {
-    align-items: flex-start;
+    align-items: center;
   }
 }
 
-/* =========================
-   MOBILE (≤ 480px)
-========================= */
 
 @media (max-width: 480px) {
   .task-filters {
@@ -106,6 +116,5 @@
   .task-filters__mark-all {
     width: 100%;
     text-align: center;
-    padding: 10px;
   }
 }

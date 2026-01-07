@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 
-const Header = ({ onToggleSidebar, onAddTask }) => {
+const Header = () => {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -37,27 +37,10 @@ const Header = ({ onToggleSidebar, onAddTask }) => {
   return (
     <header className="app-header">
       <div className="app-header__left">
-        {/* Mobile sidebar toggle */}
-        <button
-          className="header-menu-btn"
-          onClick={onToggleSidebar}
-          aria-label="Toggle sidebar"
-        >
-          ☰
-        </button>
-
-        <h1 className="app-header__title">Todo Excellence</h1>
+        <h1 className="app-header__title">📅 Todo Excellence</h1>
       </div>
 
       <div className="app-header__right" ref={ref}>
-        {/* Mobile Add Task */}
-        <button
-          className="header-add-task-btn"
-          onClick={onAddTask}
-        >
-          + Add Task
-        </button>
-
         <button
           className="theme-toggle"
           onClick={toggleTheme}
@@ -68,7 +51,7 @@ const Header = ({ onToggleSidebar, onAddTask }) => {
 
         <button
           className="header-user"
-          onClick={() => setOpen((prev) => !prev)}
+          onClick={() => setOpen(prev => !prev)}
         >
           {user.name}
           <span className="header-role">({user.role})</span>

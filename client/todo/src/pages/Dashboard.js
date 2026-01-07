@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import TaskModal from "../components/TaskModal/TaskModal";
 import { useAuth } from "../context/AuthContext";
-import Sidebar from "../components/Sidebar";
-import TaskItem from "../components/TaskItem";
 import Header from "../components/Header";
 import TaskSearch from "../components/TaskSearch";
 import TaskFilters from "../components/TaskFilter";
+import TaskTable from "../components/TaskTable/TaskTable";
+import Swal from "sweetalert2";
 
 const PRIORITY_ORDER = {
   Urgent: 4,
@@ -27,8 +27,6 @@ const Dashboard = () => {
   const { user } = useAuth();
 
   const [todos, setTodos] = useState([]);
-  const [activityLogs, setActivityLogs] = useState([]);
-
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
     status: "",
@@ -36,7 +34,6 @@ const Dashboard = () => {
     category: ""
   });
 
-  // ADMIN FILTER
   const [users, setUsers] = useState([]);
   const [assignedUser, setAssignedUser] = useState("");
 
@@ -47,16 +44,10 @@ const Dashboard = () => {
   const [modalMode, setModalMode] = useState("view");
   const [modalSource, setModalSource] = useState("task_list");
   const [selectedTodoId, setSelectedTodoId] = useState(null);
-  const [activityContext, setActivityContext] = useState(null);
 
-  const [markAllLoading, setMarkAllLoading] = useState(false);
-
-  // 🔹 RESPONSIVE SIDEBAR STATE
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchTodos();
-    fetchActivityLogs();
 
     if (user?.role === "admin") {
       api.get("/users").then(res => setUsers(res.data));
@@ -72,16 +63,6 @@ const Dashboard = () => {
     setTodos(res.data);
   };
 
-  const fetchActivityLogs = async () => {
-    const res = await api.get("/activity-logs");
-    setActivityLogs(res.data);
-  };
-
-  const refreshDashboard = async () => {
-    await fetchTodos();
-    await fetchActivityLogs();
-  };
-
   const openCreateTaskModal = () => {
     setSelectedTodoId(null);
     setModalMode("create");
@@ -89,19 +70,38 @@ const Dashboard = () => {
     setModalOpen(true);
   };
 
-  const handleMarkAllDone = async () => {
-    if (markAllLoading) return;
+  const openViewTaskModal = (id) => {
+    setSelectedTodoId(id);
+    setModalMode("view");
+    setModalSource("task_list");
+    setModalOpen(true);
+  };
 
+  const openEditTaskModal = (id) => {
+    setSelectedTodoId(id);
+    setModalMode("edit");
+    setModalSource("task_list");
+    setModalOpen(true);
+  };
+
+  const deleteTask = async (id) => {
     try {
-      setMarkAllLoading(true);
-      await api.put("/todos/mark-all-completed");
-      await refreshDashboard();
-    } finally {
-      setMarkAllLoading(false);
+      await api.delete(`/todos/${id}`);
+      fetchTodos();
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Delete failed",
+        text: "Something went wrong. Try again."
+      });
     }
   };
 
-  // FILTER
+  const markAllDone = async () => {
+    await api.put("/todos/mark-all-completed");
+    fetchTodos();
+  };
+
   const filteredTodos = todos
     .filter(todo =>
       todo.title.toLowerCase().includes(search.toLowerCase())
@@ -121,7 +121,6 @@ const Dashboard = () => {
       todo.assignedTo?._id === assignedUser
     );
 
-  // SORT
   const sortedTodos = [...filteredTodos].sort((a, b) => {
     if (sortBy === "dueDate") {
       if (!a.dueDate) return 1;
@@ -149,41 +148,19 @@ const Dashboard = () => {
     currentPage * TASKS_PER_PAGE
   );
 
-  const hasIncompleteTasks = todos.some(todo => todo.status !== "Done");
-
   return (
     <div className="dashboard">
-      <Header
-        onToggleSidebar={() => setSidebarOpen(prev => !prev)}
-        onAddTask={openCreateTaskModal}
-      />
+      <Header />
 
-      <div className="dashboard__content">
-        <aside className={`dashboard__sidebar ${sidebarOpen ? "is-open" : ""}`}>
-          <Sidebar
-            activityLogs={activityLogs}
-            onAddTask={openCreateTaskModal}
-            onOpenActivity={(log) => {
-              setSelectedTodoId(log.todo);
-              setActivityContext(log);
-              setModalMode("view");
-              setModalSource("activity_log");
-              setModalOpen(true);
-              setSidebarOpen(false);
-            }}
-          />
-        </aside>
+      <main className="dashboard__main">
+        <h2>Tasks</h2>
 
-        <main className="dashboard__main">
-          <h2>Tasks</h2>
-
+        <div className="task-controls-row">
           <TaskSearch value={search} onChange={setSearch} />
 
           <TaskFilters
             filters={filters}
             onChange={setFilters}
-            onMarkAllDone={handleMarkAllDone}
-            disableMarkAllDone={!hasIncompleteTasks || markAllLoading}
           />
 
           {user?.role === "admin" && (
@@ -210,69 +187,28 @@ const Dashboard = () => {
             <option value="priority">Priority</option>
             <option value="status">Status</option>
           </select>
+        </div>
 
-          <ul>
-            {paginatedTodos.length === 0 ? (
-              <li className="empty-state">
-                <p className="empty-state__title">
-                  {todos.length === 0
-                    ? "No tasks yet"
-                    : "No tasks match your filters"}
-                </p>
-                <p className="empty-state__subtitle">
-                  {todos.length === 0
-                    ? "Create one to get started."
-                    : "Try adjusting filters."}
-                </p>
-              </li>
-            ) : (
-              paginatedTodos.map(todo => (
-                <TaskItem
-                  key={todo._id}
-                  todo={todo}
-                  onClick={() => {
-                    setSelectedTodoId(todo._id);
-                    setModalMode("view");
-                    setModalSource("task_list");
-                    setModalOpen(true);
-                  }}
-                />
-              ))
-            )}
-          </ul>
-
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button
-                onClick={() => setCurrentPage(p => p - 1)}
-                disabled={currentPage === 1}
-              >
-                Prev
-              </button>
-
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                onClick={() => setCurrentPage(p => p + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </main>
-      </div>
+        <TaskTable
+          todos={paginatedTodos}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onAddTask={openCreateTaskModal}
+          onViewTask={openViewTaskModal}
+          onEditTask={openEditTaskModal}
+          onDeleteTask={deleteTask}
+          onMarkAllDone={markAllDone}
+        />
+      </main>
 
       <TaskModal
         isOpen={modalOpen}
         mode={modalMode}
         source={modalSource}
         todoId={selectedTodoId}
-        activityContext={activityContext}
         onClose={() => setModalOpen(false)}
-        onSuccess={refreshDashboard}
+        onSuccess={fetchTodos}
       />
     </div>
   );

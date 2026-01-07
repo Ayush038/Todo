@@ -1,43 +1,38 @@
-/* =========================
-   LIGHT MODE (DEFAULT)
-   ========================= */
+
 :root {
-  /* Background layers */
   --bg-base: linear-gradient(
     180deg,
-    #f8fafc 0%,
-    #eef2f7 100%
+    #F6F1EA 0%,
+    #ECE3D8 100%
   );
 
-  --bg-surface: #ffffff;
-  --bg-elevated: #f9fafb;
-  --bg-hover: #eef2f7;
+  --bg-surface: #F3EADF;
+  --bg-elevated: #E9D8C6;
+  --bg-hover: #E2CDB8;
 
-  /* Text colors */
-  --text-primary: #0f172a;   /* headings */
-  --text-secondary: #475569; /* body text */
-  --text-muted: #64748b;     /* meta, timestamps */
+  --text-primary: #3A2E28;
+  --text-secondary: #6A564A;
+  --text-muted: #8B786C;
 }
 
 
-/* =========================
-   DARK MODE
-   ========================= */
 [data-theme="dark"] {
-  /* Background layers */
   --bg-base: linear-gradient(
     180deg,
-    #020617 0%,
-    #020617 30%,
-    #020617 100%
+    #1E1F29 0%,
+    #1B1C25 100%
   );
 
-  --bg-surface: #0b1220;
-  --bg-elevated: #111c33;
-  --bg-hover: #1a2a4a;
+  --bg-surface: #232530;
+  --bg-elevated: #2A2C3A;
+  --bg-hover: #32344A;
 
-  /* Text colors */
-  --text-primary: #e5e7eb;
-  --text-secondary: #cbd5f5;
-  --text-muted: #94a3b8;
+  --text-primary: #F8F8F2;
+  --text-secondary: #C6C8D1;
+  --text-muted: #9A9CAB;
+
+  --accent-primary: #BD93F9;
+  --accent-hover: #A77BEE;
+
+  --border-subtle: #3A3C4E;
 }

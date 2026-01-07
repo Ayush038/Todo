@@ -2,9 +2,16 @@
 @import './styles/login.scss';
 @import './styles/base.scss';
 @import './styles/dashboard.scss';
-@import './styles/sidebar.scss';
 @import './styles/task-item.scss';
 @import './styles/header.scss';
 @import './styles/task-modal.scss';
 @import './styles/taskSearch.scss';
 @import './styles/theme.scss';
+@import url('https://fonts.googleapis.com/css2?family=Chiron+Hei+HK:ital,wght@0,200..900;1,200..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Smooch+Sans:wght@100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+*{
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}

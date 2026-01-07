@@ -41,13 +41,6 @@ const TaskFilters = ({ filters, onChange, onMarkAllDone }) => {
           ))}
         </select>
       </div>
-
-      <button
-        className="task-filters__mark-all"
-        onClick={onMarkAllDone}
-      >
-        Mark all done
-      </button>
     </div>
   );
 };

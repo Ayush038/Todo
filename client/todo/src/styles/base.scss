@@ -23,9 +23,6 @@ textarea {
     border-color 0.25s ease;
 }
 
-/* =========================
-   ROOT & BODY
-========================= */
 
 html,
 body {
@@ -34,7 +31,6 @@ body {
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
   background: var(--bg-base);
   color: var(--text-secondary);
@@ -47,9 +43,6 @@ body {
     color 0.25s ease;
 }
 
-/* =========================
-   HEADINGS
-========================= */
 
 h1,
 h2,
@@ -61,9 +54,6 @@ h6 {
   margin: 0;
 }
 
-/* =========================
-   INTERACTIVE ELEMENTS
-========================= */
 
 button {
   cursor: pointer;
@@ -78,16 +68,12 @@ button {
   background: transparent;
 }
 
-/* Prevent iOS zoom on focus */
 input,
 textarea,
 select {
   font-size: 16px;
 }
 
-/* =========================
-   LIST RESET
-========================= */
 
 ul {
   list-style: none;
@@ -95,16 +81,12 @@ ul {
   margin: 0;
 }
 
-/* =========================
-   ACCESSIBILITY & UX
-========================= */
 
 :focus-visible {
   outline: 2px solid rgba(99, 102, 241, 0.6);
   outline-offset: 2px;
 }
 
-/* Disable transitions for users who hate motion */
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;

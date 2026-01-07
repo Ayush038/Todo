@@ -4,6 +4,7 @@ import { canEditField, isReadOnlyMode } from "../../utils/permission";
 import api from "../../api/axios";
 import { PRIORITIES, STATUSES, CATEGORIES } from "../../utils/constants";
 import { confirmAction } from "../../utils/confirm";
+import Swal from "sweetalert2";
 
 const TaskModal = ({
   isOpen,
@@ -36,15 +37,10 @@ const TaskModal = ({
 
     setCurrentMode(mode);
 
-    if (user?.role === "admin") {
-      fetchUsers();
-    }
+    if (user?.role === "admin") fetchUsers();
 
-    if (todoId) {
-      fetchTodo(todoId);
-    } else {
-      resetForm();
-    }
+    if (todoId) fetchTodo(todoId);
+    else resetForm();
   }, [isOpen, todoId, mode]);
 
   const resetForm = () => {
@@ -61,12 +57,8 @@ const TaskModal = ({
   };
 
   const fetchUsers = async () => {
-    try {
-      const res = await api.get("/users");
-      setUsers(res.data);
-    } catch (err) {
-      console.error("Failed to fetch users", err);
-    }
+    const res = await api.get("/users");
+    setUsers(res.data);
   };
 
   const fetchTodo = async (id) => {
@@ -75,8 +67,6 @@ const TaskModal = ({
       const res = await api.get(`/todos/${id}`);
       setTodo(res.data);
       hydrateForm(res.data);
-    } catch (err) {
-      console.error("Failed to fetch todo", err);
     } finally {
       setLoading(false);
     }
@@ -101,13 +91,32 @@ const TaskModal = ({
 
   const handleSubmit = async () => {
     if (!formData.title.trim() || !formData.category) {
-      alert("Title and category are required");
+      Swal.fire({
+        icon: "warning",
+        title: "Missing fields",
+        text: "Title and category are required."
+      });
       return;
     }
 
-    try {
-      setLoading(true);
+    if (currentMode === "edit") {
+      const result = await Swal.fire({
+        title: "Save changes?",
+        text: "Are you sure you want to save these changes?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, save",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+        focusCancel: true
+      });
 
+      if (!result.isConfirmed) return;
+    }
+
+    setLoading(true);
+
+    try {
       if (currentMode === "create") {
         const payload = {
           title: formData.title.trim(),
@@ -123,8 +132,13 @@ const TaskModal = ({
         }
 
         await api.post("/todos", payload);
-        await onSuccess?.();
-        onClose();
+
+        Swal.fire({
+          icon: "success",
+          title: "Task created",
+          timer: 1200,
+          showConfirmButton: false
+        });
       }
 
       if (currentMode === "edit" && todoId) {
@@ -142,40 +156,51 @@ const TaskModal = ({
             : { status: formData.status };
 
         await api.put(`/todos/${todoId}`, payload);
-        await onSuccess?.();
-        onClose();
+
+        Swal.fire({
+          icon: "success",
+          title: "Saved successfully",
+          timer: 1200,
+          showConfirmButton: false
+        });
       }
+
+      await onSuccess?.();
+      onClose();
+
     } catch (err) {
-      console.error("Failed to save task", err);
-      alert(err.response?.data?.message || "Failed to save task");
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Save failed",
+        text: "Something went wrong. Please try again."
+      });
     } finally {
       setLoading(false);
     }
   };
 
-    const handleDelete = async () => {
+  const handleDelete = async () => {
     if (!todoId) return;
 
     const confirmed = await confirmAction({
-        title: "Delete task?",
-        text: "This task will be permanently removed.",
-        confirmText: "Delete",
-        cancelText: "Cancel"
+      title: "Delete task?",
+      text: "This task will be permanently removed.",
+      confirmText: "Delete",
+      cancelText: "Cancel"
     });
 
     if (!confirmed) return;
 
+    setLoading(true);
     try {
-        setLoading(true);
-        await api.delete(`/todos/${todoId}`);
-        await onSuccess?.();
-        onClose();
-    } catch (err) {
-        console.error("Failed to delete task", err);
+      await api.delete(`/todos/${todoId}`);
+      await onSuccess?.();
+      onClose();
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   if (!isOpen) return null;
 
@@ -192,6 +217,8 @@ const TaskModal = ({
   return (
     <div className="modal-backdrop">
       <div className="task-modal">
+
+        {/* HEADER */}
         <header className="task-modal__header">
           <h2 className="task-modal__title">
             {currentMode === "create" && "Create Task"}
@@ -204,11 +231,11 @@ const TaskModal = ({
           <div className="task-modal__loading">Loading...</div>
         ) : (
           <div className="task-modal__body">
-            {/* Title */}
-            <div className="task-modal__field">
-              <label className="task-modal__label">Title</label>
+
+            {/* TITLE */}
+            <div className="task-modal__field task-modal__field--title">
+              <label>Title</label>
               <input
-                className="task-modal__input"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
@@ -216,11 +243,10 @@ const TaskModal = ({
               />
             </div>
 
-            {/* Description */}
-            <div className="task-modal__field">
-              <label className="task-modal__label">Description</label>
+            {/* DESCRIPTION */}
+            <div className="task-modal__field task-modal__field--description">
+              <label>Description</label>
               <textarea
-                className="task-modal__textarea"
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
@@ -228,114 +254,97 @@ const TaskModal = ({
               />
             </div>
 
-            {/* Category */}
-            <div className="task-modal__field">
-              <label className="task-modal__label">Category</label>
-              <select
-                className="task-modal__select"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                disabled={!isCreateMode && (readOnly || !canEditField(user, "category"))}
-              >
-                <option value="">Select category</option>
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Priority */}
-            <div className="task-modal__field">
-              <label className="task-modal__label">Priority</label>
-              <select
-                className="task-modal__select"
-                name="priority"
-                value={formData.priority}
-                onChange={handleChange}
-                disabled={!isCreateMode && (readOnly || !canEditField(user, "priority"))}
-              >
-                {PRIORITIES.map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Status */}
-            <div className="task-modal__field">
-              <label className="task-modal__label">Status</label>
-              <select
-                className="task-modal__select"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                disabled={!isCreateMode && (readOnly || !canEditField(user, "status"))}
-              >
-                {STATUSES.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Due Date */}
-            <div className="task-modal__field">
-              <label className="task-modal__label">Due Date</label>
-              <input
-                className="task-modal__input"
-                type="date"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleChange}
-                disabled={!isCreateMode && (readOnly || !canEditField(user, "dueDate"))}
-              />
-            </div>
-
-            {/* Assigned To (Admin only) */}
-            {user?.role === "admin" && (
+            {/* ROW: Priority | Status | Category */}
+            <div className="task-modal__row">
               <div className="task-modal__field">
-                <label className="task-modal__label">Assigned To</label>
+                <label>Priority</label>
                 <select
-                  className="task-modal__select"
-                  name="assignedTo"
-                  value={formData.assignedTo}
+                  name="priority"
+                  value={formData.priority}
                   onChange={handleChange}
-                  disabled={!isCreateMode && readOnly}
+                  disabled={!isCreateMode && (readOnly || !canEditField(user, "priority"))}
                 >
-                  <option value="">Select user</option>
-                  {users.map(u => (
-                    <option key={u._id} value={u._id}>{u.name}</option>
+                  {PRIORITIES.map(p => (
+                    <option key={p} value={p}>{p}</option>
                   ))}
                 </select>
               </div>
-            )}
+
+              <div className="task-modal__field">
+                <label>Status</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  disabled={!isCreateMode && (readOnly || !canEditField(user, "status"))}
+                >
+                  {STATUSES.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="task-modal__field">
+                <label>Category</label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  disabled={!isCreateMode && (readOnly || !canEditField(user, "category"))}
+                >
+                  <option value="">Select category</option>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* ROW: Assigned To | Due Date */}
+            <div className="task-modal__row">
+              {user?.role === "admin" && (
+                <div className="task-modal__field">
+                  <label>Assigned To</label>
+                  <select
+                    name="assignedTo"
+                    value={formData.assignedTo}
+                    onChange={handleChange}
+                    disabled={!isCreateMode && readOnly}
+                  >
+                    <option value="">Select user</option>
+                    {users.map(u => (
+                      <option key={u._id} value={u._id}>{u.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="task-modal__field">
+                <label>Due Date</label>
+                <input
+                  type="date"
+                  name="dueDate"
+                  value={formData.dueDate}
+                  onChange={handleChange}
+                  disabled={!isCreateMode && (readOnly || !canEditField(user, "dueDate"))}
+                />
+              </div>
+            </div>
+
           </div>
         )}
 
+        {/* FOOTER */}
         <footer className="task-modal__footer">
           {canDelete && (
-            <button
-              className="task-modal__btn task-modal__btn--danger"
-              onClick={handleDelete}
-            >
+            <button className="task-modal__btn task-modal__btn--danger" onClick={handleDelete}>
               Delete
             </button>
           )}
 
-          <button
-            className="task-modal__btn task-modal__btn--secondary"
-            onClick={onClose}
-          >
+          <button className="task-modal__btn task-modal__btn--secondary" onClick={onClose}>
             Close
           </button>
-
-          {currentMode === "view" && source === "task_list" && (
-            <button
-              className="task-modal__btn task-modal__btn--primary"
-              onClick={() => setCurrentMode("edit")}
-            >
-              Edit
-            </button>
-          )}
 
           {(currentMode === "edit" || currentMode === "create") && (
             <button
@@ -347,6 +356,7 @@ const TaskModal = ({
             </button>
           )}
         </footer>
+
       </div>
     </div>
   );
